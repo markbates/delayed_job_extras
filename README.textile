@@ -1,0 +1,3 @@
+README
+========================================================================
+delayed_job_extras was developed by: markbates
