@@ -1,10 +1,7 @@
 require 'rubygems'
 require 'spec'
-
-module Delayed
-  class Job
-  end
-end
+require File.join(File.dirname(__FILE__), 'database.rb')
+require File.join(File.dirname(__FILE__), '..', 'delayed_job', 'lib', 'delayed_job')
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'delayed_job_extras')
 
