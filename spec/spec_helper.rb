@@ -1,6 +1,11 @@
 require 'rubygems'
 require 'spec'
 
+module Delayed
+  class Job
+  end
+end
+
 require File.join(File.dirname(__FILE__), '..', 'lib', 'delayed_job_extras')
 
 Spec::Runner.configure do |config|
@@ -34,6 +39,10 @@ end
 
 class VideoWorker < Delayed::BaseWorker
   
+  def initialize(*args)
+    
+  end
+  
   def perform
     super do
       raise BlockRan.new
@@ -54,3 +63,8 @@ end
 
 class BlockRan < StandardError
 end
+
+require 'logger'
+logger = Logger.new(STDOUT)
+logger.level = Logger::INFO
+RAILS_DEFAULT_LOGGER = logger

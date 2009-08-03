@@ -30,4 +30,40 @@ describe Delayed::BaseWorker do
     
   end
   
+  describe 'logger' do
+    
+    it 'should return the RAILS_DEFAULT_LOGGER' do
+      v = VideoWorker.new
+      v.logger.should be_kind_of(Logger)
+      v.logger.should == RAILS_DEFAULT_LOGGER
+    end
+    
+  end
+  
+  describe 'self' do
+    
+    describe 'method_missing' do
+      
+      it 'should enqueue the worker and pass the args to the initialize method' do
+        w = mock('video_worker')
+        VideoWorker.should_receive(:new).with(:encode, 1).and_return(w)
+        Delayed::Job.should_receive(:enqueue).with(w)
+        VideoWorker.encode(1)
+      end
+      
+    end
+    
+    describe 'enqueue' do
+      
+      it 'should enqueue the worke and pass the args to the initialize method' do
+        w = mock('video_worker')
+        VideoWorker.should_receive(:new).with(1).and_return(w)
+        Delayed::Job.should_receive(:enqueue).with(w)
+        VideoWorker.enqueue(1)
+      end
+      
+    end
+    
+  end
+  
 end
