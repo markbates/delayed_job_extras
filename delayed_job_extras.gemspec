@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{delayed_job_extras}
-  s.version = "0.1.0.20090805113418"
+  s.version = "0.1.0.20090805134733"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["markbates"]
@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.description = %q{Adds support for Hoptoad and is_paranoid to Delayed::Job. Additionally it also adds 'stats' for your workers, and it even includes a base worker that encapsulates a some common functionality.}
   s.email = %q{}
   s.extra_rdoc_files = ["README", "LICENSE"]
-  s.files = ["lib/delayed_job_extras/job.rb", "lib/delayed_job_extras/performable_method.rb", "lib/delayed_job_extras/worker.rb", "lib/delayed_job_extras.rb", "lib/delayed_job_test_enhancements.rb", "README", "LICENSE"]
+  s.files = ["lib/delayed_job_extras/job.rb", "lib/delayed_job_extras/performable_method.rb", "lib/delayed_job_extras/worker.rb", "lib/delayed_job_extras.rb", "lib/delayed_job_test_enhancements.rb", "README", "LICENSE", "generators/dj_extras_generator.rb", "generators/templates/migration.rb"]
   s.homepage = %q{}
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{magrathea}
