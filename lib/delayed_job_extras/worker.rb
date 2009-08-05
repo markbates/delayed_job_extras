@@ -1,5 +1,5 @@
 module Delayed
-  class BaseWorker
+  class Worker
     
     if Object.const_defined?(:HoptoadNotifier)
       include HoptoadNotifier::Catcher
@@ -8,24 +8,8 @@ module Delayed
       end
     end
     
-    def task_name
+    def worker_name
       self.class.to_s.underscore
-    end
-    
-    # Example:
-    #   def perform
-    #     super do
-    #       # some heavy work here
-    #     end
-    #   end
-    def perform
-      begin
-        yield if block_given?
-      rescue Exception => e
-        # send to hoptoad!
-        notify_hoptoad(e)
-        raise e
-      end
     end
     
     def logger
@@ -43,8 +27,20 @@ module Delayed
       def enqueue(*args)
         Delayed::Job.enqueue(self.new(*args))
       end
+      
+      def perform(&block)
+        define_method(:perform) do
+          begin
+            block.call
+          rescue Exception => e
+            # send to hoptoad!
+            notify_hoptoad(e)
+            raise e
+          end
+        end
+      end
 
     end
     
-  end # BaseWorker
+  end # Worker
 end # Delayed

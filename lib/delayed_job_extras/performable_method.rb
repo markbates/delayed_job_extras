@@ -1,14 +1,14 @@
 module Delayed
   class PerformableMethod
     
-    attr_accessor :task_name
+    attr_accessor :worker_name
     
-    def initialize_with_task_name(object, method, args)
-      self.task_name = "#{object.class}__#{method}".underscore
-      initialize_without_task_name(object, method, args)
+    def initialize_with_worker_name(object, method, args)
+      self.worker_name = "#{object.class}__#{method}".underscore
+      initialize_without_worker_name(object, method, args)
     end
     
-    alias_method_chain :initialize, :task_name
+    alias_method_chain :initialize, :worker_name
     
     if Object.const_defined?(:HoptoadNotifier)
       include HoptoadNotifier::Catcher

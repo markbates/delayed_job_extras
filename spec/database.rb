@@ -16,7 +16,15 @@ ActiveRecord::Schema.define do
     table.datetime :failed_at
     table.timestamps
     table.datetime :deleted_at
-    table.string   :task_name
+    table.string   :worker_name
+  end
+  
+  create_table :videos, :force => true do |t|
+    t.string :title
+    t.text :description
+    t.string :file_name
+    t.boolean :encoded, :default => false
+    t.timestamps
   end
 
 end

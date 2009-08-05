@@ -59,7 +59,7 @@ module Delayed
     end
 
     def payload_object=(object)
-      puts "payload_object_without_task_name: object: #{object.inspect}"
+      puts "payload_object_without_worker_name: object: #{object.inspect}"
       self['handler'] = object.to_yaml
     end
 

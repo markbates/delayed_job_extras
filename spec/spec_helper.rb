@@ -4,6 +4,7 @@ require File.join(File.dirname(__FILE__), 'database.rb')
 require File.join(File.dirname(__FILE__), '..', 'delayed_job', 'lib', 'delayed_job')
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'delayed_job_extras')
+require File.join(File.dirname(__FILE__), '..', 'lib', 'delayed_job_test_enhancements')
 
 Spec::Runner.configure do |config|
   
@@ -26,34 +27,42 @@ Spec::Runner.configure do |config|
 end
 
 module HoptoadNotifier
+  def self.caught(e)
+  end
+  
   module Catcher
     
     def notify_hoptoad(e)
+      HoptoadNotifier.caught(e)
     end
     
   end
 end
 
-class VideoWorker < Delayed::BaseWorker
+class Video < ActiveRecord::Base
+  
+  def encode
+    raise 'Hell!'
+  end
+  
+end
+
+class VideoWorker < Delayed::Worker
   
   def initialize(*args)
     
   end
   
-  def perform
-    super do
-      raise BlockRan.new
-    end
+  perform do
+    raise BlockRan.new
   end
   
 end
 
-class VideoErrorWorker < Delayed::BaseWorker
+class VideoErrorWorker < Delayed::Worker
   
-  def perform
-    super do
-      raise 'Hell!'
-    end
+  perform do
+    raise 'Hell!'
   end
   
 end

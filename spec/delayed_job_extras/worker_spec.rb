@@ -1,12 +1,12 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
-describe Delayed::BaseWorker do
+describe Delayed::Worker do
   
-  describe 'task_name' do
+  describe 'worker_name' do
     
     it 'should return the underscored class name' do
       v = VideoWorker.new
-      v.task_name.should == 'video_worker'
+      v.worker_name.should == 'video_worker'
     end
     
   end
