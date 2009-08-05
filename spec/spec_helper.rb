@@ -67,6 +67,20 @@ class VideoErrorWorker < Delayed::Worker
   
 end
 
+class HelloWorker < Delayed::Worker
+  
+  attr_accessor :my_name
+  
+  def initialize(name)
+    self.my_name = name
+  end
+  
+  perform do
+    self.my_name
+  end
+  
+end
+
 class BlockRan < StandardError
 end
 

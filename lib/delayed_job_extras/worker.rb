@@ -31,7 +31,7 @@ module Delayed
       def perform(&block)
         define_method(:perform) do
           begin
-            block.call
+            self.instance_eval(&block)
           rescue Exception => e
             # send to hoptoad!
             notify_hoptoad(e)

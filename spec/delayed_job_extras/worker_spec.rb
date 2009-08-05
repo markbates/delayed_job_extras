@@ -28,6 +28,11 @@ describe Delayed::Worker do
       }.should raise_error(RuntimeError)
     end
     
+    it 'should use the instance of itself as the binding' do
+      hw = HelloWorker.new('Mark')
+      hw.perform.should == 'Mark'
+    end
+    
   end
   
   describe 'logger' do
