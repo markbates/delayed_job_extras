@@ -16,7 +16,7 @@ ActiveRecord::Schema.define do
     table.datetime :failed_at
     table.timestamps
     table.datetime :deleted_at
-    table.string   :worker_name
+    table.string   :worker_class_name
   end
   
   create_table :videos, :force => true do |t|

@@ -8,7 +8,7 @@ module Delayed
       end
     end
     
-    def worker_name
+    def worker_class_name
       self.class.to_s.underscore
     end
     

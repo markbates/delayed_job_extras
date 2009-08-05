@@ -5,24 +5,24 @@ describe Delayed::Job do
   describe 'stats' do
     
     it 'should return stats for all the workers' do
-      # Delayed::Job.find_with_destroyed(:all, :select => :worker_name, :group => :worker_name)
+      # Delayed::Job.find_with_destroyed(:all, :select => :worker_class_name, :group => :worker_class_name)
       workers = []
       w1 = mock('worker_one')
-      w1.should_receive(:worker_name).at_least(:once).and_return('worker_one')
+      w1.should_receive(:worker_class_name).at_least(:once).and_return('worker_one')
       workers << w1
       wnil = mock('worker_nil')
-      wnil.should_receive(:worker_name).at_least(:once).and_return(nil, 'UNKNOWN')
-      wnil.should_receive(:worker_name=).with('UNKNOWN')
+      wnil.should_receive(:worker_class_name).at_least(:once).and_return(nil, 'UNKNOWN')
+      wnil.should_receive(:worker_class_name=).with('UNKNOWN')
       workers << wnil
       
-      Delayed::Job.should_receive(:find_with_destroyed).with(:all, :select => :worker_name, :group => :worker_name).and_return(workers)
-      Delayed::Job.should_receive(:count_with_destroyed).with(:conditions => {:worker_name => 'worker_one'}).and_return(100)
-      Delayed::Job.should_receive(:count).with(:conditions => {:worker_name => 'worker_one'}).and_return(75)
-      Delayed::Job.should_receive(:count).with(:conditions => ['worker_name = ? and attempts > 1', 'worker_one']).and_return(10)
+      Delayed::Job.should_receive(:find_with_destroyed).with(:all, :select => :worker_class_name, :group => :worker_class_name).and_return(workers)
+      Delayed::Job.should_receive(:count_with_destroyed).with(:conditions => {:worker_class_name => 'worker_one'}).and_return(100)
+      Delayed::Job.should_receive(:count).with(:conditions => {:worker_class_name => 'worker_one'}).and_return(75)
+      Delayed::Job.should_receive(:count).with(:conditions => ['worker_class_name = ? and attempts > 1', 'worker_one']).and_return(10)
       
-      Delayed::Job.should_receive(:count_with_destroyed).with(:conditions => {:worker_name => nil}).and_return(10)
-      Delayed::Job.should_receive(:count).with(:conditions => {:worker_name => nil}).and_return(0)
-      Delayed::Job.should_receive(:count).with(:conditions => ['worker_name = ? and attempts > 1', nil]).and_return(0)
+      Delayed::Job.should_receive(:count_with_destroyed).with(:conditions => {:worker_class_name => nil}).and_return(10)
+      Delayed::Job.should_receive(:count).with(:conditions => {:worker_class_name => nil}).and_return(0)
+      Delayed::Job.should_receive(:count).with(:conditions => ['worker_class_name = ? and attempts > 1', nil]).and_return(0)
       
       stats = Delayed::Job.stats
       worker_one = stats['worker_one']

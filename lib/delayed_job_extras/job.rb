@@ -9,7 +9,7 @@ module Delayed
     end
     
     def payload_object=(object)
-      self.worker_name = object.worker_name if object.respond_to?(:worker_name)
+      self.worker_class_name = object.worker_class_name if object.respond_to?(:worker_class_name)
       self['handler'] = object.to_yaml
     end
     
@@ -17,16 +17,16 @@ module Delayed
       
       def stats
         workers = {}
-        Delayed::Job.find_with_destroyed(:all, :select => :worker_name, :group => :worker_name).each do |dj|
-          dj.worker_name = 'UNKNOWN' if dj.worker_name.blank?
-          workers[dj.worker_name] = {} 
+        Delayed::Job.find_with_destroyed(:all, :select => :worker_class_name, :group => :worker_class_name).each do |dj|
+          dj.worker_class_name = 'UNKNOWN' if dj.worker_class_name.blank?
+          workers[dj.worker_class_name] = {} 
         end
         workers.each do |worker, stats|
           wname = (worker == 'UNKNOWN' ? nil : worker)
-          stats[:total] = Delayed::Job.count_with_destroyed(:conditions => {:worker_name => wname})
-          stats[:remaining] = Delayed::Job.count(:conditions => {:worker_name => wname})
+          stats[:total] = Delayed::Job.count_with_destroyed(:conditions => {:worker_class_name => wname})
+          stats[:remaining] = Delayed::Job.count(:conditions => {:worker_class_name => wname})
           stats[:processed] = stats[:total] - stats[:remaining]
-          stats[:failures] = Delayed::Job.count(:conditions => ['worker_name = ? and attempts > 1', wname])
+          stats[:failures] = Delayed::Job.count(:conditions => ['worker_class_name = ? and attempts > 1', wname])
           workers[worker] = stats
         end
         workers
