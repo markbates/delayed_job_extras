@@ -24,7 +24,7 @@ describe Delayed::Job do
       Delayed::Job.should_receive(:count).with(:conditions => {:worker_class_name => nil}).and_return(0)
       Delayed::Job.should_receive(:count).with(:conditions => ['worker_class_name = ? and attempts > 1', nil]).and_return(0)
       
-      stats = Delayed::Job.stats
+      stats = Delayed::Job.stats(nil, nil)
       worker_one = stats['worker_one']
       worker_one.should_not be_nil
       worker_one[:total].should == 100
