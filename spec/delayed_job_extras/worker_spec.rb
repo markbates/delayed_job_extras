@@ -50,9 +50,7 @@ describe Delayed::Worker do
     describe 'method_missing' do
       
       it 'should enqueue the worker and pass the args to the initialize method' do
-        w = mock('video_worker')
-        VideoWorker.should_receive(:new).with(:encode, 1).and_return(w)
-        Delayed::Job.should_receive(:enqueue).with(w)
+        Delayed::Job.should_receive(:enqueue).with(instance_of(VideoWorker), :priority => 0)
         VideoWorker.encode(1)
       end
       
@@ -62,9 +60,29 @@ describe Delayed::Worker do
       
       it 'should enqueue the worke and pass the args to the initialize method' do
         w = mock('video_worker')
+        w.should_receive(:enqueue)
         VideoWorker.should_receive(:new).with(1).and_return(w)
-        Delayed::Job.should_receive(:enqueue).with(w)
         VideoWorker.enqueue(1)
+      end
+      
+      it 'should enqueue the worker' do
+        hw = HelloWorker.new('mark')
+        Delayed::Job.should_receive(:enqueue).with(hw, :priority => 1000)
+        hw.enqueue
+      end
+      
+    end
+    
+    describe 'priority' do
+      
+      it 'should set the priority of the job' do
+        Delayed::Job.should_receive(:enqueue).with(instance_of(HelloWorker), :priority => 1000)
+        HelloWorker.enqueue('mark')
+      end
+      
+      it 'should translate symbols to ints' do
+        Delayed::Job.should_receive(:enqueue).with(instance_of(GoodByeWorker), :priority => 500)
+        GoodByeWorker.enqueue
       end
       
     end

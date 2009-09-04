@@ -70,6 +70,7 @@ end
 class HelloWorker < Delayed::Worker
   
   attr_accessor :my_name
+  priority 1000
   
   def initialize(name)
     self.my_name = name
@@ -77,6 +78,15 @@ class HelloWorker < Delayed::Worker
   
   perform do
     self.my_name
+  end
+  
+end
+
+class GoodByeWorker < Delayed::Worker
+  
+  priority :medium
+  
+  perform do
   end
   
 end
