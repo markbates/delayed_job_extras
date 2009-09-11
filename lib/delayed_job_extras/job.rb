@@ -13,6 +13,13 @@ module Delayed
       self['handler'] = object.to_yaml
     end
     
+    def invoke_job_with_dj
+      payload_object.dj_object = self if payload_object.respond_to?(:dj_object)
+      invoke_job_without_dj
+    end
+    
+    alias_method_chain :invoke_job, :dj
+    
     class << self
       
       def stats(start_date = 1.day.ago.beginning_of_day, end_date = Time.now.beginning_of_day)

@@ -2,6 +2,16 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe Delayed::Worker do
   
+  it 'should receive the DJ object when performed' do
+    vw = GoodByeWorker.new
+    vw.should_receive(:dj_object=).with(instance_of(Delayed::Job))
+    job = Delayed::Job.new
+    job.stub(:payload_object=).with(vw)
+    job.stub(:payload_object).and_return(vw)
+    job.invoke_job
+    #(:payload_object => vw, :priority => 0, :run_at => Time.now)
+  end
+  
   describe 'worker_class_name' do
     
     it 'should return the underscored class name' do

@@ -3,6 +3,8 @@ module Delayed
     
     PRIORITY_LEVELS = {:immediate => 10000, :high => 1000, :medium => 500, :normal => 0, :low => -100, :who_cares => -1000}
     
+    attr_accessor :dj_object
+    
     def priority=(x)
       @priority = x
     end
@@ -15,6 +17,7 @@ module Delayed
       include HoptoadNotifier::Catcher
     else
       def notify_hoptoad(e)
+        logger.error(e)
       end
     end
     
