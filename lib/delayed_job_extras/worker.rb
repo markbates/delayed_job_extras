@@ -29,9 +29,8 @@ module Delayed
       RAILS_DEFAULT_LOGGER
     end
     
-    def enqueue(options = {})
-      options = {:priority => self.priority}.merge(options)
-      Delayed::Job.enqueue(self, options)
+    def enqueue(priority = self.priority, run_at = Time.now)
+      Delayed::Job.enqueue(self, priority, run_at)
     end
 
     class << self
