@@ -13,6 +13,14 @@ module Delayed
       return @priority ||= 0
     end
     
+    def run_at=(x)
+      @run_at = x
+    end
+    
+    def run_at
+      return @run_at ||= Time.now
+    end
+    
     if Object.const_defined?(:HoptoadNotifier)
       include HoptoadNotifier::Catcher
     else
@@ -29,7 +37,7 @@ module Delayed
       RAILS_DEFAULT_LOGGER
     end
     
-    def enqueue(priority = self.priority, run_at = Time.now)
+    def enqueue(priority = self.priority, run_at = self.run_at)
       Delayed::Job.enqueue(self, priority, run_at)
     end
 
