@@ -14,6 +14,8 @@ begin
 rescue Exception => e
 end
 
+require 'split_logger'
+
 Dir.glob(File.join(File.dirname(__FILE__), 'delayed_job_extras', '**/*.rb')).each do |f|
   require File.expand_path(f)
 end

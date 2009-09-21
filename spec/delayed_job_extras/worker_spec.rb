@@ -43,14 +43,29 @@ describe Delayed::Worker do
       hw.perform.should == 'Mark'
     end
     
+    it 'should log' do
+      dj_object = mock('dj_object')
+      dj_object.should_receive(:id).once.and_return(1)
+      hw = HelloWorker.new('Mark')
+      hw.should_receive(:dj_object).twice.and_return(dj_object)
+      hw.logger.should_receive(:info).with("Starting HelloWorker#perform (DJ.id = '1')")
+      hw.logger.should_receive(:info).with("Completed HelloWorker#perform (DJ.id = '1') [SUCCESS]")
+      hw.perform.should == 'Mark'
+    end
+    
   end
   
   describe 'logger' do
     
-    it 'should return the RAILS_DEFAULT_LOGGER' do
+    it 'should return the Delayed::Worker.logger' do
       v = VideoWorker.new
-      v.logger.should be_kind_of(Logger)
-      v.logger.should == RAILS_DEFAULT_LOGGER
+      v.logger.should === Delayed::Worker.logger
+    end
+    
+    it 'should return a logger if set' do
+      v = VideoWorker.new
+      v.logger = ::Logger.new(STDOUT)
+      v.logger.should_not === Delayed::Worker.logger
     end
     
   end

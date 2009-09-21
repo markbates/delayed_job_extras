@@ -5,8 +5,9 @@ Gemstub.test_framework = :rspec
 
 Gemstub.gem_spec do |s|
   s.description = %{Adds support for Hoptoad and is_paranoid to Delayed::Job. Additionally it also adds 'stats' for your workers, and it even includes a base worker that encapsulates a some common functionality.}
-  s.version = "0.1.8"
+  s.version = "0.1.9"
   s.rubyforge_project = "magrathea"
+  s.add_dependency('markbates-split_logger')
   s.files = FileList['lib/**/*.*', 'README', 'LICENSE', 'bin/**/*.*', 'generators/**/*.*']
 end
 
