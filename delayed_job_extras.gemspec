@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{delayed_job_extras}
-  s.version = "0.1.9.20090921172429"
+  s.version = "0.2.0.20090922114857"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["markbates"]
-  s.date = %q{2009-09-21}
+  s.date = %q{2009-09-22}
   s.description = %q{Adds support for Hoptoad and is_paranoid to Delayed::Job. Additionally it also adds 'stats' for your workers, and it even includes a base worker that encapsulates a some common functionality.}
   s.email = %q{}
   s.extra_rdoc_files = ["README", "LICENSE"]
