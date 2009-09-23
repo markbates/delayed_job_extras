@@ -8,6 +8,7 @@ module Delayed
         end
       end
       obj.perform
+      obj.respond_to?(:dj_object) ? obj.dj_object : nil
     end
   end
 end
