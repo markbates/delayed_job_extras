@@ -1,5 +1,5 @@
 module Delayed
-  class Job
+  class Job < ActiveRecord::Base
     
     if (self.respond_to?(:is_paranoid))
       is_paranoid
