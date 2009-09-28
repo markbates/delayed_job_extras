@@ -51,10 +51,10 @@ module Delayed
       logger.level = ActiveRecord::Base.logger.level
       ActiveRecord::Base.logger = logger
       ActiveRecord::Base.clear_active_connections!
-      Delayed::Worker.logger = logger
+      DJ::Worker.logger = logger
       Delayed::Job.worker_name = "#{worker_name} #{Delayed::Job.worker_name}"
       
-      Delayed::Worker.new(@options).start  
+      DJ::Worker.new(@options).start  
     rescue => e
       logger.fatal e
       STDERR.puts e.message

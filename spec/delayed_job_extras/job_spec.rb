@@ -2,6 +2,57 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe Delayed::Job do
   
+  describe 'pending?' do
+    
+    it 'should be true if the job is queued, but not running' do
+      dj = Delayed::Job.new
+      dj.should be_pending
+    end
+    
+  end
+  
+  describe 'running?' do
+    
+    it 'should be true if the job is running, but not finished' do
+      dj = Delayed::Job.new
+      dj.started_at = Time.now
+      dj.should be_running
+    end
+    
+    it 'should be set when the job starts' do
+      jb = Delayed::Job.create(:payload_object => GobstopperWorker.new, :priority => 0, :run_at => Time.now)
+      jb.should_receive(:touch).with(:started_at)
+      jb.should_receive(:touch).with(:finished_at)
+      jb.invoke_job
+    end
+    
+    it 'should be rolled back if the job fails' do
+      jb = Delayed::Job.create(:payload_object => FlobstopperWorker.new, :priority => 0, :run_at => Time.now)
+      jb.should_receive(:touch).with(:started_at)
+      jb.should_receive(:update_attributes).with(:started_at => nil)
+      lambda {jb.invoke_job}.should raise_error
+    end
+    
+  end
+  
+  describe 'finished?' do
+    
+    it 'should be true if the job is finished running' do
+      dj = Delayed::Job.new
+      dj.started_at = Time.now
+      dj.finished_at = Time.now
+      dj.should be_finished
+    end
+    
+    it 'should be set when the job starts' do
+      jb = Delayed::Job.create(:payload_object => GobstopperWorker.new, :priority => 0, :run_at => Time.now)
+      jb.should_receive(:touch).with(:started_at)
+      jb.should_receive(:touch).with(:finished_at)
+      jb.invoke_job
+    end
+    
+  end
+  
   describe 'stats' do
     
     it 'should return stats for all the workers' do

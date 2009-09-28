@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
-describe Delayed::Worker do
+describe DJ::Worker do
   
   it 'should receive the DJ object when performed' do
     vw = GoodByeWorker.new
@@ -46,8 +46,10 @@ describe Delayed::Worker do
     it 'should log' do
       dj_object = mock('dj_object')
       dj_object.should_receive(:id).once.and_return(1)
+      dj_object.should_receive(:touch).with(:started_at)
+      dj_object.should_receive(:touch).with(:finished_at)
       hw = HelloWorker.new('Mark')
-      hw.should_receive(:dj_object).twice.and_return(dj_object)
+      hw.should_receive(:dj_object).at_least(:once).and_return(dj_object)
       hw.logger.should_receive(:info).with("Starting HelloWorker#perform (DJ.id = '1')")
       hw.logger.should_receive(:info).with("Completed HelloWorker#perform (DJ.id = '1') [SUCCESS]")
       hw.perform.should == 'Mark'
@@ -57,15 +59,15 @@ describe Delayed::Worker do
   
   describe 'logger' do
     
-    it 'should return the Delayed::Worker.logger' do
+    it 'should return the DJ::Worker.logger' do
       v = VideoWorker.new
-      v.logger.should === Delayed::Worker.logger
+      v.logger.should === DJ::Worker.logger
     end
     
     it 'should return a logger if set' do
       v = VideoWorker.new
       v.logger = ::Logger.new(STDOUT)
-      v.logger.should_not === Delayed::Worker.logger
+      v.logger.should_not === DJ::Worker.logger
     end
     
   end

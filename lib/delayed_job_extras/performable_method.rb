@@ -16,14 +16,20 @@ module Delayed
       
       def perform_with_hoptoad
         dj_id = 'unknown'
-        dj_id = self.dj_object.id if self.dj_object
+        if self.dj_object
+          dj_id = self.dj_object.id
+          self.dj_object.touch(:started_at)
+        end
         begin
-          Delayed::Worker.logger.info("Starting #{self.class.name}#perform (DJ.id = '#{dj_id}')")
-          perform_without_hoptoad
-          Delayed::Worker.logger.info("Completed #{self.class.name}#perform (DJ.id = '#{dj_id}') [SUCCESS]")
+          DJ::Worker.logger.info("Starting #{self.class.name}#perform (DJ.id = '#{dj_id}')")
+          val = perform_without_hoptoad
+          DJ::Worker.logger.info("Completed #{self.class.name}#perform (DJ.id = '#{dj_id}') [SUCCESS]")
+          self.dj_object.touch(:finished_at) if self.dj_object
+          return val
         rescue Exception => e
           notify_hoptoad(e)
-          Delayed::Worker.logger.info("Halted #{self.class.name}#perform (DJ.id = '#{dj_id}') [FAILURE]")
+          DJ::Worker.logger.error("Halted #{self.class.name}#perform (DJ.id = '#{dj_id}') [FAILURE]")
+          self.dj_object.update_attributes(:started_at => nil) if self.dj_object
           raise e
         end
       end

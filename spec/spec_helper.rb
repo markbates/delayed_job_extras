@@ -17,11 +17,13 @@ Spec::Runner.configure do |config|
   end
   
   config.before(:each) do
-    
+    Delayed::Job.delete_all
+    Video.delete_all
   end
   
   config.after(:each) do
-    
+    Delayed::Job.delete_all
+    Video.delete_all
   end
   
 end
@@ -45,9 +47,12 @@ class Video < ActiveRecord::Base
     raise 'Hell!'
   end
   
+  def decode
+  end
+  
 end
 
-class VideoWorker < Delayed::Worker
+class VideoWorker < DJ::Worker
   
   def initialize(*args)
     
@@ -59,7 +64,7 @@ class VideoWorker < Delayed::Worker
   
 end
 
-class VideoErrorWorker < Delayed::Worker
+class VideoErrorWorker < DJ::Worker
   
   perform do
     raise 'Hell!'
@@ -67,7 +72,7 @@ class VideoErrorWorker < Delayed::Worker
   
 end
 
-class HelloWorker < Delayed::Worker
+class HelloWorker < DJ::Worker
   
   attr_accessor :my_name
   priority 1000
@@ -82,7 +87,7 @@ class HelloWorker < Delayed::Worker
   
 end
 
-class GoodByeWorker < Delayed::Worker
+class GoodByeWorker < DJ::Worker
   
   priority :medium
   
@@ -92,6 +97,17 @@ class GoodByeWorker < Delayed::Worker
 end
 
 class BlockRan < StandardError
+end
+
+class GobstopperWorker < DJ::Worker
+  perform do
+  end
+end
+
+class FlobstopperWorker < DJ::Worker
+  perform do
+    raise Hell!
+  end
 end
 
 require 'logger'

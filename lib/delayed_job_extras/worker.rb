@@ -1,4 +1,4 @@
-module Delayed
+module DJ
   class Worker
     
     PRIORITY_LEVELS = {:immediate => 10000, :high => 1000, :medium => 500, :normal => 0, :low => -100, :who_cares => -1000}
@@ -35,7 +35,7 @@ module Delayed
     end
     
     def logger
-      @logger || Delayed::Worker.logger
+      @logger || DJ::Worker.logger
     end
     
     def enqueue(priority = self.priority, run_at = self.run_at)
@@ -57,7 +57,7 @@ module Delayed
       def priority(level = 0)
         define_method('priority') do
           if level.is_a?(Symbol)
-            level = Delayed::Worker::PRIORITY_LEVELS[level] ||= 0
+            level = DJ::Worker::PRIORITY_LEVELS[level] ||= 0
           end
           return @priority ||= level
         end
@@ -76,16 +76,22 @@ module Delayed
       def perform(&block)
         define_method(:perform) do
           dj_id = 'unknown'
-          dj_id = self.dj_object.id if self.dj_object
+          if self.dj_object
+            dj_id = self.dj_object.id
+            self.dj_object.touch(:started_at)
+          end
           begin
             self.logger.info("Starting #{self.class.name}#perform (DJ.id = '#{dj_id}')")
             val = self.instance_eval(&block)
             self.logger.info("Completed #{self.class.name}#perform (DJ.id = '#{dj_id}') [SUCCESS]")
+            self.dj_object.touch(:finished_at) if self.dj_object
             return val
           rescue Exception => e
+            puts e
             # send to hoptoad!
             notify_hoptoad(e)
-            self.logger.info("Halted #{self.class.name}#perform (DJ.id = '#{dj_id}') [FAILURE]")
+            self.logger.error("Halted #{self.class.name}#perform (DJ.id = '#{dj_id}') [FAILURE]")
+            self.dj_object.update_attributes(:started_at => nil) if self.dj_object
             raise e
           end
         end

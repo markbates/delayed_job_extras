@@ -20,6 +20,18 @@ module Delayed
     
     alias_method_chain :invoke_job, :dj
     
+    def pending?
+      self.started_at.nil? && self.finished_at.nil?
+    end
+    
+    def running?
+      !self.started_at.nil? && self.finished_at.nil?
+    end
+    
+    def finished?
+      !self.started_at.nil? && !self.finished_at.nil?
+    end
+    
     class << self
       
       def stats(start_date = 1.day.ago.beginning_of_day, end_date = Time.now.beginning_of_day)

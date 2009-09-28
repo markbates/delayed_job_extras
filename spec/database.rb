@@ -17,6 +17,8 @@ ActiveRecord::Schema.define do
     table.timestamps
     table.datetime :deleted_at
     table.string   :worker_class_name
+    table.datetime :started_at
+    table.datetime :finished_at
   end
   
   create_table :videos, :force => true do |t|
