@@ -39,19 +39,15 @@ describe Delayed::PerformableMethod do
     it 'should call hoptoad and then re-raise the error' do
       v = Video.create!(:title => 'my video', :file_name => 'my_video.mov')
       HoptoadNotifier.should_receive(:caught).with(instance_of(RuntimeError))
-      lambda {
-        v.send_later(:encode)
-      }.should raise_error(RuntimeError)
+      v.send_later(:encode)
     end
     
     it 'should log' do
-      DJ::Worker.logger.should_receive(:info).with("Starting Delayed::PerformableMethod#perform (DJ.id = '')")
-      DJ::Worker.logger.should_receive(:error).with("Halted Delayed::PerformableMethod#perform (DJ.id = '') [FAILURE]")
+      DJ::Worker.logger.should_receive(:info).with(/Starting Delayed::PerformableMethod#perform \(DJ\.id = '\d'\)/)
+      DJ::Worker.logger.should_receive(:error).with(/Halted Delayed::PerformableMethod#perform \(DJ\.id = '\d'\) \[FAILURE\]/)
       v = Video.create!(:title => 'my video', :file_name => 'my_video.mov')
       HoptoadNotifier.should_receive(:caught).with(instance_of(RuntimeError))
-      lambda {
-        v.send_later(:encode)
-      }.should raise_error(RuntimeError)
+      v.send_later(:encode)
     end
     
   end

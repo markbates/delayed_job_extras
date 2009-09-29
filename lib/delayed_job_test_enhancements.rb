@@ -1,14 +1,12 @@
 module Delayed
   class Job
     
-    def self.enqueue(obj, *args)
-      if obj.respond_to?(:dj_object)
-        if obj.dj_object.nil?
-          obj.dj_object = Delayed::Job.new
-        end
+    class << self
+      def enqueue_with_work_off(obj, *args)
+        enqueue_without_work_off(obj, *args)
+        Delayed::Job.work_off
       end
-      obj.perform
-      obj.respond_to?(:dj_object) ? obj.dj_object : nil
+      alias_method_chain :enqueue, :work_off
     end
     
   end

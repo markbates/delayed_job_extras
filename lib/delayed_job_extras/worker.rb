@@ -104,7 +104,6 @@ module DJ
             self.dj_object.touch(:finished_at) if self.dj_object
             return val
           rescue Exception => e
-            puts e
             # send to hoptoad!
             notify_hoptoad(e)
             self.logger.error("Halted #{self.class.name}#perform (DJ.id = '#{dj_id}') [FAILURE]")
