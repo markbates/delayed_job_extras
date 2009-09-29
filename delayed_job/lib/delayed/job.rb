@@ -234,7 +234,6 @@ module Delayed
       raise DeserializationError,
         'Job failed to load: Unknown handler. Try to manually require the appropriate file.'
     rescue TypeError, LoadError, NameError => e
-      puts source.inspect
       raise DeserializationError,
         "Job failed to load: #{e.message}. Try to manually require the required file."
     end

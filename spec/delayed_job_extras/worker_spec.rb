@@ -12,6 +12,82 @@ describe DJ::Worker do
     #(:payload_object => vw, :priority => 0, :run_at => Time.now)
   end
   
+  describe 'unique?' do
+    
+    it 'should only allow 1 instance at a time in the queue' do
+      class OneOfAKind < DJ::Worker
+        def unique?
+          true
+        end
+        perform do
+        end
+      end
+      lambda {
+        job = Delayed::Job.new(:payload_object => OneOfAKind.new)
+        job.save!
+      }.should change(Delayed::Job, :count).by(1)
+      
+      lambda {
+        job = Delayed::Job.new(:payload_object => OneOfAKind.new)
+        job.save.should be_false
+        job.errors[:base].should include("Only one one_of_a_kind can be queued at a time!")
+      }.should_not change(Delayed::Job, :count)
+    end
+    
+    it 'should let many workers in the queue if false' do
+      class ManyOfAKind < DJ::Worker
+        perform do
+        end
+      end
+      2.times do
+        lambda {
+          job = Delayed::Job.new(:payload_object => ManyOfAKind.new)
+          job.save!
+        }.should change(Delayed::Job, :count).by(1)
+      end
+    end
+    
+  end
+  
+  describe 'reenqueue' do
+    
+    it 'should reenqueue itself w/ the original args' do
+      now = Time.now
+      Time.stub!(:now).and_return(now)
+      
+      class ForeverWorker < DJ::Worker
+        perform do
+          self.reenqueue
+        end
+      end
+      fw = ForeverWorker.new(1, 2, 3)
+      fw_mock = mock('ForeverWorker')
+      fw_mock.should_receive(:enqueue)
+      ForeverWorker.should_receive(:new).with(1, 2, 3).and_return(fw_mock)
+      fw.perform
+    end
+    
+    it 'should yield up the new job' do
+      now = Time.now
+      Time.stub!(:now).and_return(now)
+      
+      class ForeverWorker < DJ::Worker
+        perform do
+          self.reenqueue do |job|
+            job.run_at = 1
+          end
+        end
+      end
+      fw = ForeverWorker.new(1, 2, 3)
+      fw_mock = mock('ForeverWorker')
+      fw_mock.should_receive(:run_at=).with(1)
+      fw_mock.should_receive(:enqueue)
+      ForeverWorker.should_receive(:new).with(1, 2, 3).and_return(fw_mock)
+      fw.perform
+    end
+    
+  end
+  
   describe 'worker_class_name' do
     
     it 'should return the underscored class name' do

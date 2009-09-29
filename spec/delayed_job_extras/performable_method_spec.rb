@@ -45,8 +45,8 @@ describe Delayed::PerformableMethod do
     end
     
     it 'should log' do
-      DJ::Worker.logger.should_receive(:info).with("Starting Delayed::PerformableMethod#perform (DJ.id = '1')")
-      DJ::Worker.logger.should_receive(:error).with("Halted Delayed::PerformableMethod#perform (DJ.id = '1') [FAILURE]")
+      DJ::Worker.logger.should_receive(:info).with("Starting Delayed::PerformableMethod#perform (DJ.id = '')")
+      DJ::Worker.logger.should_receive(:error).with("Halted Delayed::PerformableMethod#perform (DJ.id = '') [FAILURE]")
       v = Video.create!(:title => 'my video', :file_name => 'my_video.mov')
       HoptoadNotifier.should_receive(:caught).with(instance_of(RuntimeError))
       lambda {

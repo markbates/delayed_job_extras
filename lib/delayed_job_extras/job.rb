@@ -10,6 +10,7 @@ module Delayed
     
     def payload_object=(object)
       self.worker_class_name = object.worker_class_name if object.respond_to?(:worker_class_name)
+      @payload_object = object
       self['handler'] = object.to_yaml
     end
     
@@ -31,6 +32,19 @@ module Delayed
     def finished?
       !self.started_at.nil? && !self.finished_at.nil?
     end
+    
+    def validate_with_unique
+      validate_without_unique
+      if self['handler'] && self.payload_object && self.payload_object.is_a?(DJ::Worker) && self.new_record?
+        if self.payload_object.unique?
+          if Delayed::Job.count(:all, :conditions => {:worker_class_name => self.worker_class_name, :finished_at => nil}) > 0
+            self.errors.add_to_base("Only one #{self.worker_class_name} can be queued at a time!")
+          end
+        end
+      end
+    end
+    
+    alias_method_chain :validate, :unique
     
     class << self
       

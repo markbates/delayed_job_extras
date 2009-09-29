@@ -5,6 +5,12 @@ module DJ
     
     attr_accessor :dj_object
     attr_accessor :logger
+    attr_accessor :__original_args
+    
+    def initialize(*args)
+      self.__original_args = *args
+      return self
+    end
     
     def priority=(x)
       @priority = x
@@ -40,6 +46,17 @@ module DJ
     
     def enqueue(priority = self.priority, run_at = self.run_at)
       Delayed::Job.enqueue(self, priority, run_at)
+    end
+    
+    def reenqueue
+      job = self.class.new(*self.__original_args)
+      yield job if block_given?
+      self.dj_object.touch(:finished_at) if self.dj_object
+      job.enqueue
+    end
+    
+    def unique?
+      false
     end
 
     class << self
