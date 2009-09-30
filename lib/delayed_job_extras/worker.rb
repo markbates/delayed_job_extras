@@ -105,7 +105,7 @@ module DJ
             return val
           rescue Exception => e
             # send to hoptoad!
-            notify_hoptoad(e)
+            notify_hoptoad(exception_to_data(e).merge(:dj => self.dj_object.inspect))
             self.logger.error("Halted #{self.class.name}#perform (DJ.id = '#{dj_id}') [FAILURE]")
             self.dj_object.update_attributes(:started_at => nil) if self.dj_object
             raise e

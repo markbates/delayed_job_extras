@@ -108,7 +108,7 @@ describe DJ::Worker do
     
     it 'should call hoptoad and then re-raise the error' do
       w = VideoErrorWorker.new
-      w.should_receive(:notify_hoptoad).with(instance_of(RuntimeError))
+      w.should_receive(:notify_hoptoad).with(instance_of(Hash))
       lambda {
         w.perform
       }.should raise_error(RuntimeError)

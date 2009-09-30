@@ -27,7 +27,7 @@ module Delayed
           self.dj_object.touch(:finished_at) if self.dj_object
           return val
         rescue Exception => e
-          notify_hoptoad(e)
+          notify_hoptoad(exception_to_data(e).merge(:dj => self.dj_object.inspect))
           DJ::Worker.logger.error("Halted #{self.class.name}#perform (DJ.id = '#{dj_id}') [FAILURE]")
           self.dj_object.update_attributes(:started_at => nil) if self.dj_object
           raise e
