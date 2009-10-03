@@ -1,10 +1,31 @@
 require 'rubygems'
 require 'spec'
+require 'singleton'
 require File.join(File.dirname(__FILE__), 'database.rb')
 require File.join(File.dirname(__FILE__), '..', 'delayed_job', 'lib', 'delayed_job')
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'delayed_job_extras')
 require File.join(File.dirname(__FILE__), '..', 'lib', 'delayed_job_test_enhancements')
+
+class ResultCatcher
+  include Singleton
+  attr_accessor :results
+  
+  def initialize
+    self.clear!
+  end
+  
+  def clear!
+    self.results = []
+  end
+  
+  class << self
+    def method_missing(sym, *args)
+      ResultCatcher.instance.send(sym, *args)
+    end
+  end
+  
+end
 
 Spec::Runner.configure do |config|
   
@@ -17,11 +38,13 @@ Spec::Runner.configure do |config|
   end
   
   config.before(:each) do
+    ResultCatcher.clear!
     Delayed::Job.delete_all
     Video.delete_all
   end
   
   config.after(:each) do
+    ResultCatcher.clear!
     Delayed::Job.delete_all
     Video.delete_all
   end

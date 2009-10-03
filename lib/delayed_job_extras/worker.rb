@@ -58,6 +58,15 @@ module DJ
     def unique?
       false
     end
+    
+    def before_perform
+    end
+    
+    def after_success
+    end
+    
+    def after_failure
+    end
 
     class << self
       
@@ -98,16 +107,19 @@ module DJ
             self.dj_object.touch(:started_at)
           end
           begin
+            self.before_perform
             self.logger.info("Starting #{self.class.name}#perform (DJ.id = '#{dj_id}')")
             val = self.instance_eval(&block)
             self.logger.info("Completed #{self.class.name}#perform (DJ.id = '#{dj_id}') [SUCCESS]")
             self.dj_object.touch(:finished_at) if self.dj_object
+            self.after_success
             return val
           rescue Exception => e
             # send to hoptoad!
             notify_hoptoad(exception_to_data(e).merge(:dj => self.dj_object.inspect))
             self.logger.error("Halted #{self.class.name}#perform (DJ.id = '#{dj_id}') [FAILURE]")
             self.dj_object.update_attributes(:started_at => nil) if self.dj_object
+            self.after_failure
             raise e
           end
         end

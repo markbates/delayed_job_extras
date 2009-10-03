@@ -12,6 +12,40 @@ describe DJ::Worker do
     #(:payload_object => vw, :priority => 0, :run_at => Time.now)
   end
   
+  describe 'before_perform' do
+    
+    it 'should trigger before the perform method' do
+      gw = GoodByeWorker.new
+      gw.should_receive(:before_perform)
+      gw.perform
+    end
+    
+  end
+  
+  describe 'after_success' do
+    
+    it 'should trigger after a successful job' do
+      gw = GoodByeWorker.new
+      gw.should_receive(:after_success)
+      gw.should_not_receive(:after_failure)
+      gw.perform
+    end
+    
+  end
+  
+  describe 'after_failure' do
+    
+    it 'should trigger after a failed job' do
+      w = VideoWorker.new
+      w.should_not_receive(:after_success)
+      w.should_receive(:after_failure)
+      lambda {
+        w.perform
+      }.should raise_error(BlockRan)
+    end
+    
+  end
+  
   describe 'unique?' do
     
     it 'should only allow 1 instance at a time in the queue' do
