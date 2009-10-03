@@ -48,6 +48,8 @@ module DJ
       Delayed::Job.enqueue(self, priority, run_at)
     end
     
+    alias_method :save, :enqueue
+    
     def reenqueue
       job = self.class.new(*self.__original_args)
       yield job if block_given?
