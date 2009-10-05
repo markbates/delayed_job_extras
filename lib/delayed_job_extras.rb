@@ -1,21 +1,12 @@
-begin
-  # If the hoptoad_notifier gem is available
-  # let's use it so we can get some good notifications
-  # when an exception is raised.
-  require 'hoptoad_notifier'
-rescue Exception => e
-end
-
-begin
-  # If the is_paranoid gem is available
-  # let's use it so we can have a record of the
-  # tasks that have been performed.
-  require 'is_paranoid'
-rescue Exception => e
-end
-
 require 'split_logger'
 
-Dir.glob(File.join(File.dirname(__FILE__), 'delayed_job_extras', '**/*.rb')).each do |f|
-  require File.expand_path(f)
-end
+
+path = File.join(File.dirname(__FILE__), 'delayed_job_extras')
+require File.join(path, 'extras')
+require File.join(path, 'job')
+require File.join(path, 'performable_method')
+require File.join(path, 'worker')
+require File.join(path, 'action_mailer')
+
+require File.join(path, 'hoptoad')
+require File.join(path, 'is_paranoid')
