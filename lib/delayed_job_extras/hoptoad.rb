@@ -14,7 +14,12 @@ begin
         begin
           invoke_job_without_hoptoad
         rescue Exception => e
-          notify_hoptoad(exception_to_data(e).merge(:dj => self.inspect))
+          h = exception_to_data(e)
+          begin
+            h[:environment][:delayed_job] = self.to_yaml
+          rescue TypeError => ex
+          end
+          notify_hoptoad(h)
           raise e
         end
       end
