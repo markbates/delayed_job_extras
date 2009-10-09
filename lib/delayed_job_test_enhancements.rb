@@ -1,4 +1,4 @@
-unless defined?('DELAYED_JOB_TEST_ENHANCEMENTS')
+unless defined?(DELAYED_JOB_TEST_ENHANCEMENTS)
   
   module Delayed
     class Job
