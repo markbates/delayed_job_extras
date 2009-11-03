@@ -84,15 +84,13 @@ describe Delayed::Job do
           'string'
         end
       end
-      dj = Delayed::Job.new
-      dj.should_receive(:worker_class_name=).with('string')
-      dj.payload_object = x
+      dj = Delayed::Job.new(:payload_object => x)
+      dj.worker_class_name.should == 'string'
     end
     
     it 'should assign unknown as the worker_class_name if there is not one' do
       dj = Delayed::Job.new
-      dj.should_receive(:worker_class_name=).with('unknown')
-      dj.payload_object = 'Hi!'
+      dj.worker_class_name.should == 'unknown'
     end
     
   end

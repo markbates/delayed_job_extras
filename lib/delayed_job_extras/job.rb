@@ -45,11 +45,6 @@ module Delayed
     
     alias_method_chain :validate, :unique
     
-    def payload_object=(payload)
-      self.worker_class_name = payload.respond_to?(:worker_class_name) ? payload.worker_class_name : 'unknown'
-      self['handler'] = payload.to_yaml
-    end
-    
     def pending?
       self.started_at.nil? && self.finished_at.nil?
     end
@@ -60,6 +55,17 @@ module Delayed
     
     def finished?
       !self.started_at.nil? && !self.finished_at.nil?
+    end
+    
+    class << self
+      
+      def new_with_worker_class_name(options = {})
+        worker_class_name = options[:payload_object].respond_to?(:worker_class_name) ? options[:payload_object].worker_class_name : 'unknown'
+        new_without_worker_class_name({:worker_class_name => worker_class_name}.merge(options))
+      end
+      
+      alias_method_chain :new, :worker_class_name
+      
     end
     
   end # Job
