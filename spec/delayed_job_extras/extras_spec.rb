@@ -7,7 +7,7 @@ describe Delayed::Job::Extras do
     class RunForeverWorker < DJ::Worker
       re_enqueue {|current, new_worker| new_worker.priority = 795}
       
-      def initialize(options, arr)  
+      def initialize(options)
       end
       
       def perform
@@ -18,7 +18,7 @@ describe Delayed::Job::Extras do
     it 'should re_enqueue the worker' do
       t = Time.now
       Time.stub!(:now).and_return(t)
-      w = RunForeverWorker.new({:foo => :bar}, [1,2,3])
+      w = RunForeverWorker.new({:foo => :bar, :one => 1})
       w.enqueue
       Delayed::Job.should_receive(:enqueue).with(instance_of(RunForeverWorker), 795, t)
       Delayed::Job.work_off
@@ -41,7 +41,7 @@ describe Delayed::Job::Extras do
       w.__original_args.should == [1, 2, 3]
       
       w = IHaveNoArgsWorker.new
-      w.__original_args.should == nil
+      w.__original_args.should == []
     end
     
   end
