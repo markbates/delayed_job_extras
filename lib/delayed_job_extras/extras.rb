@@ -11,7 +11,7 @@ module Delayed
           class << self
             def new_with_extras(*args)
               klass = new_without_extras(*args)
-              klass.__original_args = args
+              klass.__original_args = *args
               return klass
             end
 

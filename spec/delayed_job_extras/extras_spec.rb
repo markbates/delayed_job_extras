@@ -36,12 +36,20 @@ describe Delayed::Job::Extras do
     class IHaveNoArgsWorker < DJ::Worker
     end
     
+    class ILikeHashArgsWorker < DJ::Worker
+      def initialize(options)
+      end
+    end
+    
     it 'should be set with the original args' do
       w = IHaveArgsWorker.new(1, 2, 3)
       w.__original_args.should == [1, 2, 3]
       
+      w = ILikeHashArgsWorker.new({:foo => :bar, :one => 1})
+      w.__original_args.should == {:foo => :bar, :one => 1}
+      
       w = IHaveNoArgsWorker.new
-      w.__original_args.should == []
+      w.__original_args.should == nil
     end
     
   end
