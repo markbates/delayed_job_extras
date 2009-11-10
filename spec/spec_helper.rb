@@ -54,15 +54,7 @@ Spec::Runner.configure do |config|
 end
 
 module HoptoadNotifier
-  def self.caught(e)
-  end
-  
-  module Catcher
-    
-    def notify_hoptoad(e)
-      HoptoadNotifier.caught(e)
-    end
-    
+  def self.notify(*args)
   end
 end
 

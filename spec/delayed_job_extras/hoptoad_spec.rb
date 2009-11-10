@@ -10,7 +10,8 @@ describe 'Hoptoad' do
   
   it 'should report exceptions to Hoptoad' do
     dj = Delayed::Job.new(:payload_object => HoptoadTestWorker.new, :priority => 0, :run_at => Time.now)
-    dj.should_receive(:notify_hoptoad).with(instance_of(Hash))
+    dj.stub!(:attributes).and_return(:id => 99)
+    HoptoadNotifier.should_receive(:notify).with(instance_of(RuntimeError), {:cgi_data => dj.attributes})
     lambda {dj.invoke_job}.should raise_error("Hell!")
   end
   

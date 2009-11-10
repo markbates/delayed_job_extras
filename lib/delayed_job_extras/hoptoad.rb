@@ -1,27 +1,26 @@
 begin
-  # If the hoptoad_notifier gem is available
-  # let's use it so we can get some good notifications
-  # when an exception is raised.
-  require 'hoptoad_notifier'
-  
+
   DJ::Worker.logger.info "Adding Hoptoad support to Delayed::Job"
   
   module Delayed
     class Job
-      include HoptoadNotifier::Catcher
       
       def invoke_job_with_hoptoad
-        begin
-          invoke_job_without_hoptoad
-        rescue Exception => e
-          h = exception_to_data(e)
-          begin
-            h[:environment][:delayed_job] = self.to_yaml
-          rescue TypeError => ex
+        if defined?(HoptoadNotifier)
+          Delayed::Job.send(:define_method, :invoke_job_with_hoptoad) do
+            begin
+              invoke_job_without_hoptoad
+            rescue Exception => e
+              HoptoadNotifier.notify(e, :cgi_data => self.attributes)
+              raise e
+            end
           end
-          notify_hoptoad(h)
-          raise e
+        else
+          Delayed::Job.send(:define_method, :invoke_job_with_hoptoad) do
+            invoke_job_without_hoptoad
+          end
         end
+        invoke_job_with_hoptoad
       end
       
       alias_method_chain :invoke_job, :hoptoad
