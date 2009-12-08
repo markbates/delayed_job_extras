@@ -10,7 +10,15 @@ module Delayed
         klass.class_eval do
           class << self
             def new_with_extras(*args)
-              klass = new_without_extras(*args)
+              begin
+                klass = new_without_extras(*args)
+              rescue ArgumentError => e
+                if e.message == 'wrong number of arguments (1 for 0)'
+                  klass = new_without_extras
+                else
+                  raise e
+                end
+              end
               klass.__original_args = *args
               return klass
             end

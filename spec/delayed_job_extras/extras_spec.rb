@@ -15,12 +15,32 @@ describe Delayed::Job::Extras do
       
     end
     
+    class RunForeverWithoutOptionsWorker < DJ::Worker
+      re_enqueue {|current, new_worker| new_worker.priority = 795}
+      
+      def initialize
+      end
+      
+      def perform
+      end
+      
+    end
+    
     it 'should re_enqueue the worker' do
       t = Time.now
       Time.stub!(:now).and_return(t)
       w = RunForeverWorker.new({:foo => :bar, :one => 1})
       w.enqueue
       Delayed::Job.should_receive(:enqueue).with(instance_of(RunForeverWorker), 795, t)
+      Delayed::Job.work_off
+    end
+    
+    it 'should re_enqueue the worker without options' do
+      t = Time.now
+      Time.stub!(:now).and_return(t)
+      w = RunForeverWithoutOptionsWorker.new({:foo => :bar, :one => 1})
+      w.enqueue
+      Delayed::Job.should_receive(:enqueue).with(instance_of(RunForeverWithoutOptionsWorker), 795, t)
       Delayed::Job.work_off
     end
     
