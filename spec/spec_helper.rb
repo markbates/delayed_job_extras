@@ -4,10 +4,12 @@ require 'singleton'
 require File.join(File.dirname(__FILE__), 'database.rb')
 require File.join(File.dirname(__FILE__), '..', 'delayed_job', 'lib', 'delayed_job')
 
-module ActionMailer
-  class Base
-  end
-end
+# module ActionMailer
+#   class Base
+#   end
+# end
+
+require 'action_mailer'
 
 require File.join(File.dirname(__FILE__), '..', 'lib', 'delayed_job_extras')
 

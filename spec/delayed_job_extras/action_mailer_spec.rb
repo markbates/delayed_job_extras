@@ -6,14 +6,16 @@ describe 'ActionMailer' do
     Object.const_defined?('PostmanWorker').should be_false
     
     class Postman < ActionMailer::Base
-      def deliver_welcome_email(user_id, subject)
+      def welcome_email(user_id, subject)
       end
     end
 
     Object.const_defined?('PostmanWorker').should be_true
-    Postman.should_receive(:deliver_welcome_email).with(1, 'hello!')
-    PostmanWorker.deliver_welcome_email(1, 'hello!')
-    Delayed::Job.work_off
+    post = mock('Postman')
+    post.should_receive(:deliver!)
+    Postman.should_receive(:new).with('welcome_email', 1, 'hello!').and_return(post)
+    job = Postman.deliver_welcome_email(1, 'hello!')
+    job.invoke_job
   end
   
 end

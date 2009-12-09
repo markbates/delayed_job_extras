@@ -1,6 +1,29 @@
 module Delayed
   class Job < ActiveRecord::Base
     
+    def reset!
+      self.run_at = Time.now
+      self.attempts = 0
+      self.last_error = nil
+      self.save!
+      self.reload
+    end
+    
+    def deserialize_with_extras(source)
+      begin
+        self['handler'].scan(/- .+ !ruby\/object:(.+)/).flatten.each do |x| 
+          x.strip!
+          # puts "x: '#{x}'"
+          x.to_s.constantize
+        end
+      rescue Exception => e
+        logger.error "Failed pre-deserialization: #{e.message}"
+      end
+      deserialize_without_extras(source)
+    end
+    
+    alias_method_chain :deserialize, :extras
+    
     def invoke_job_with_extras
       begin
         self.payload_object.dj_object = self

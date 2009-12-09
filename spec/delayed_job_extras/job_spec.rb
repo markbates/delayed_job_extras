@@ -2,6 +2,29 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe Delayed::Job do
   
+  describe 'reset!' do
+    
+    it 'should reset the job so to prestine conditions' do
+      now = Time.now
+      later = Time.now + 10000
+      Time.stub(:now).and_return(now)
+      
+      dj = Delayed::Job.new(:run_at => later, :attempts => 10, :last_error => 'Oops!')
+      dj.should_receive(:save!)
+      dj.should_receive(:reload)
+      
+      dj.run_at.should == later
+      dj.attempts.should == 10
+      dj.last_error.should == 'Oops!'
+      
+      dj.reset!
+      dj.run_at.should == now
+      dj.attempts.should == 0
+      dj.last_error.should be_nil
+    end
+    
+  end
+  
   describe 'invoke_job_with_extras' do
     
     it 'should touch timestamps and log started/completed' do

@@ -7,7 +7,9 @@ module Delayed
     attr_accessor :worker_count
     
     def initialize(args)
+      @files_to_reopen = []
       @options = {:quiet => true}
+      
       @worker_count = 1
       
       opts = OptionParser.new do |opts|
@@ -18,7 +20,7 @@ module Delayed
           exit 1
         end
         opts.on('-e', '--environment=NAME', 'Specifies the environment to run this delayed jobs under (test/development/production).') do |e|
-          ENV['RAILS_ENV'] = e
+          STDERR.puts "The -e/--environment option has been deprecated and has no effect. Use RAILS_ENV and see http://github.com/collectiveidea/delayed_job/issues/#issue/7"
         end
         opts.on('--min-priority N', 'Minimum priority of jobs to run.') do |n|
           @options[:min_priority] = n
@@ -34,6 +36,10 @@ module Delayed
     end
   
     def daemonize
+      ObjectSpace.each_object(File) do |file|
+        @files_to_reopen << file unless file.closed?
+      end
+      
       worker_count.times do |worker_index|
         process_name = worker_count == 1 ? "delayed_job" : "delayed_job.#{worker_index}"
         Daemons.run_proc(process_name, :dir => "#{RAILS_ROOT}/tmp/pids", :dir_mode => :normal, :ARGV => @args) do |*args|
@@ -44,19 +50,24 @@ module Delayed
     
     def run(worker_name = nil)
       Dir.chdir(RAILS_ROOT)
-      require File.join(RAILS_ROOT, 'config', 'environment')
       
-      # Replace the default logger
-      logger = Logger.new(File.join(RAILS_ROOT, 'log', 'delayed_job.log'))
-      logger.level = ActiveRecord::Base.logger.level
-      ActiveRecord::Base.logger = logger
-      ActiveRecord::Base.clear_active_connections!
-      DJ::Worker.logger = logger
-      Delayed::Job.worker_name = "#{worker_name} #{Delayed::Job.worker_name}"
+      # Re-open file handles
+      @files_to_reopen.each do |file|
+        begin
+          file.reopen File.join(RAILS_ROOT, 'log', 'delayed_job.log'), 'a+'
+          file.sync = true
+        rescue ::Exception
+        end
+      end
       
-      DJ::Worker.new(@options).start  
+      Delayed::Worker.logger = Rails.logger
+      ActiveRecord::Base.connection.reconnect!
+      
+      worker = Delayed::Worker.new(@options)
+      worker.name_prefix = "#{worker_name} "
+      worker.start
     rescue => e
-      logger.fatal e
+      Rails.logger.fatal e
       STDERR.puts e.message
       exit 1
     end

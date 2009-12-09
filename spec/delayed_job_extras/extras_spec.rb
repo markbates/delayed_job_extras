@@ -32,7 +32,7 @@ describe Delayed::Job::Extras do
       w = RunForeverWorker.new({:foo => :bar, :one => 1})
       w.enqueue
       Delayed::Job.should_receive(:enqueue).with(instance_of(RunForeverWorker), 795, t)
-      Delayed::Job.work_off
+      Delayed::Worker.new.send(:work_off)
     end
     
     it 'should re_enqueue the worker without options' do
@@ -41,7 +41,7 @@ describe Delayed::Job::Extras do
       w = RunForeverWithoutOptionsWorker.new({:foo => :bar, :one => 1})
       w.enqueue
       Delayed::Job.should_receive(:enqueue).with(instance_of(RunForeverWithoutOptionsWorker), 795, t)
-      Delayed::Job.work_off
+      Delayed::Worker.new.send(:work_off)
     end
     
   end
