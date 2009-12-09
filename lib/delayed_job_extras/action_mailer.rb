@@ -8,6 +8,7 @@ if defined?(ActionMailer)
           super
           eval %{
             class ::#{klass}Worker < DJ::Worker
+              priority :immediate
 
               attr_accessor :called_method
               attr_accessor :args
@@ -35,6 +36,10 @@ if defined?(ActionMailer)
         end
         
         def method_missing_with_extras(method_symbol, *parameters) #:nodoc:
+          if ActionMailer::Base.delivery_method == :test
+            return method_missing_without_extras(method_symbol, *parameters)
+          end
+          
           if match = matches_dynamic_method?(method_symbol)
             case match[1]
               when 'deliver'# then new(match[2], *parameters).deliver!
