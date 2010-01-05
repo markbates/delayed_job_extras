@@ -21,11 +21,11 @@ unless defined?(DELAYED_JOB_TEST_ENHANCEMENTS)
       
       class << self
         def disable_re_enqueue
+          # puts "disabling enqueue_again"
           eval %{
-            class DJ::Worker
-              class << self
-                def re_enqueue(*args)
-                end
+            class Delayed::Job
+              def enqueue_again
+                # puts "re enqueing has been disabled!"
               end
             end
           }
