@@ -47,7 +47,7 @@ module Delayed
     
     def enqueue_again
       if self.payload_object.re_enqueuable
-        new_worker = self.payload_object.class.new(self.payload_object.__original_args)
+        new_worker = self.payload_object.clone()
         if self.payload_object.__re_enqueue_block
           self.payload_object.__re_enqueue_block.call(self.payload_object, new_worker)
         end

@@ -7,25 +7,6 @@ module Delayed
       def self.included(klass)
         klass.send(:include, Delayed::Job::Extras::InstanceMethods)
         klass.extend(Delayed::Job::Extras::ClassMethods)
-        klass.class_eval do
-          class << self
-            def new_with_extras(*args)
-              begin
-                klass = new_without_extras(*args)
-              rescue ArgumentError => e
-                if e.message == 'wrong number of arguments (1 for 0)'
-                  klass = new_without_extras
-                else
-                  raise e
-                end
-              end
-              klass.__original_args = *args
-              return klass
-            end
-
-            alias_method_chain :new, :extras
-          end
-        end
       end
       
       module InstanceMethods
@@ -70,6 +51,12 @@ module Delayed
         
         def unique?
           false
+        end
+        
+        def clone
+          cl = super
+          cl.run_at = nil
+          cl
         end
         
       end # InstanceMethods

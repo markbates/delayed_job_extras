@@ -23,15 +23,20 @@ class RunForeverWithoutOptionsWorker < DJ::Worker
 end
 
 class IHaveArgsWorker < DJ::Worker
+  attr_accessor :a
+  attr_accessor :b
+  attr_accessor :c
   def initialize(a, b, c)
+    self.a = a
+    self.b = b
+    self.c = c
   end
 end
 
-class IHaveNoArgsWorker < DJ::Worker
-end
-
 class ILikeHashArgsWorker < DJ::Worker
+  attr_accessor :options
   def initialize(options)
+    self.options = options
   end
 end
 
@@ -54,7 +59,7 @@ describe Delayed::Job::Extras do
     it 'should re_enqueue the worker without options' do
       t = Time.now
       Time.stub!(:now).and_return(t)
-      w = RunForeverWithoutOptionsWorker.new({:foo => :bar, :one => 1})
+      w = RunForeverWithoutOptionsWorker.new
       w.enqueue
       Delayed::Job.should_receive(:enqueue).with(instance_of(RunForeverWithoutOptionsWorker), 795, t)
       Delayed::Worker.new.send(:work_off)
@@ -62,40 +67,29 @@ describe Delayed::Job::Extras do
     
   end
   
-  if ruby19?
+  describe 'clone' do
+  
+    it 'should be set with the original args' do
+      w = IHaveArgsWorker.new(1, 2, 3)
+      w.a.should == 1
+      w.b.should == 2
+      w.c.should == 3
+      w.run_at
+      w.instance_variable_get('@run_at').should_not be_nil
+
+      n = w.clone
+      n.a.should == 1
+      n.b.should == 2
+      n.c.should == 3
+      n.instance_variable_get('@run_at').should be_nil
     
-    describe '__original_args' do
-    
-      it 'should be set with the original args' do
-        w = IHaveArgsWorker.new(1, 2, 3)
-        w.__original_args.should == [1, 2, 3]
+      w = ILikeHashArgsWorker.new({:foo => :bar, :one => 1})
+      w.options.should == {:foo => :bar, :one => 1}
       
-        w = ILikeHashArgsWorker.new({:foo => :bar, :one => 1})
-        w.__original_args.should == [{:foo => :bar, :one => 1}]
-      
-        w = IHaveNoArgsWorker.new
-        w.__original_args.should == []
-      end
-    
+      n = w.clone
+      n.options.should == {:foo => :bar, :one => 1}
     end
-    
-  else
-    
-    describe '__original_args' do
-    
-      it 'should be set with the original args' do
-        w = IHaveArgsWorker.new(1, 2, 3)
-        w.__original_args.should == [1, 2, 3]
-      
-        w = ILikeHashArgsWorker.new({:foo => :bar, :one => 1})
-        w.__original_args.should == {:foo => :bar, :one => 1}
-      
-        w = IHaveNoArgsWorker.new
-        w.__original_args.should == nil
-      end
-    
-    end
-    
+  
   end
   
   describe 'enqueue' do
