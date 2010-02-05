@@ -1,5 +1,18 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
+class OneOfAKind < DJ::Worker
+  def unique?
+    true
+  end
+  def perform
+  end
+end
+
+class ManyOfAKind < DJ::Worker
+  def perform
+  end
+end
+
 describe Delayed::Job do
   
   describe 'reset!' do
@@ -121,13 +134,6 @@ describe Delayed::Job do
   describe 'unique?' do
     
     it 'should only allow 1 instance at a time in the queue' do
-      class OneOfAKind < DJ::Worker
-        def unique?
-          true
-        end
-        def perform
-        end
-      end
       lambda {
         job = Delayed::Job.new(:payload_object => OneOfAKind.new)
         job.save!
@@ -141,10 +147,6 @@ describe Delayed::Job do
     end
     
     it 'should let many workers in the queue if false' do
-      class ManyOfAKind < DJ::Worker
-        def perform
-        end
-      end
       2.times do
         lambda {
           job = Delayed::Job.new(:payload_object => ManyOfAKind.new)

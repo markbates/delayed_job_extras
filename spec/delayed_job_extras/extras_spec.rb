@@ -1,30 +1,46 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
+class RunForeverWorker < DJ::Worker
+  re_enqueue {|current, new_worker| new_worker.priority = 795}
+  
+  def initialize(options)
+  end
+  
+  def perform
+  end
+  
+end
+
+class RunForeverWithoutOptionsWorker < DJ::Worker
+  re_enqueue {|current, new_worker| new_worker.priority = 795}
+  
+  def initialize
+  end
+  
+  def perform
+  end
+  
+end
+
+class IHaveArgsWorker < DJ::Worker
+  def initialize(a, b, c)
+  end
+end
+
+class IHaveNoArgsWorker < DJ::Worker
+end
+
+class ILikeHashArgsWorker < DJ::Worker
+  def initialize(options)
+  end
+end
+
+class WorkerClassNameTestWorker < DJ::Worker
+end
+
 describe Delayed::Job::Extras do
   
   describe 're_enqueue' do
-    
-    class RunForeverWorker < DJ::Worker
-      re_enqueue {|current, new_worker| new_worker.priority = 795}
-      
-      def initialize(options)
-      end
-      
-      def perform
-      end
-      
-    end
-    
-    class RunForeverWithoutOptionsWorker < DJ::Worker
-      re_enqueue {|current, new_worker| new_worker.priority = 795}
-      
-      def initialize
-      end
-      
-      def perform
-      end
-      
-    end
     
     it 'should re_enqueue the worker' do
       t = Time.now
@@ -46,30 +62,38 @@ describe Delayed::Job::Extras do
     
   end
   
-  describe '__original_args' do
+  if ruby19?
     
-    class IHaveArgsWorker < DJ::Worker
-      def initialize(a, b, c)
-      end
-    end
+    describe '__original_args' do
     
-    class IHaveNoArgsWorker < DJ::Worker
-    end
-    
-    class ILikeHashArgsWorker < DJ::Worker
-      def initialize(options)
-      end
-    end
-    
-    it 'should be set with the original args' do
-      w = IHaveArgsWorker.new(1, 2, 3)
-      w.__original_args.should == [1, 2, 3]
+      it 'should be set with the original args' do
+        w = IHaveArgsWorker.new(1, 2, 3)
+        w.__original_args.should == [1, 2, 3]
       
-      w = ILikeHashArgsWorker.new({:foo => :bar, :one => 1})
-      w.__original_args.should == {:foo => :bar, :one => 1}
+        w = ILikeHashArgsWorker.new({:foo => :bar, :one => 1})
+        w.__original_args.should == [{:foo => :bar, :one => 1}]
       
-      w = IHaveNoArgsWorker.new
-      w.__original_args.should == nil
+        w = IHaveNoArgsWorker.new
+        w.__original_args.should == []
+      end
+    
+    end
+    
+  else
+    
+    describe '__original_args' do
+    
+      it 'should be set with the original args' do
+        w = IHaveArgsWorker.new(1, 2, 3)
+        w.__original_args.should == [1, 2, 3]
+      
+        w = ILikeHashArgsWorker.new({:foo => :bar, :one => 1})
+        w.__original_args.should == {:foo => :bar, :one => 1}
+      
+        w = IHaveNoArgsWorker.new
+        w.__original_args.should == nil
+      end
+    
     end
     
   end
@@ -113,9 +137,6 @@ describe Delayed::Job::Extras do
   end
   
   describe 'worker_class_name' do
-    
-    class WorkerClassNameTestWorker < DJ::Worker
-    end
     
     it 'should return the name of the worker' do
       w = WorkerClassNameTestWorker.new

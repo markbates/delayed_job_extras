@@ -1,15 +1,10 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require 'spec_helper'
 
 describe 'ActionMailer' do
   
   it 'should create a worker for an ActionMailer class' do
     Object.const_defined?('PostmanWorker').should be_false
-    
-    class Postman < ActionMailer::Base
-      def welcome_email(user_id, subject)
-      end
-    end
-
+    require File.join(File.dirname(__FILE__), '..', 'support', 'postman')
     Object.const_defined?('PostmanWorker').should be_true
     post = mock('Postman')
     post.should_receive(:deliver!)
