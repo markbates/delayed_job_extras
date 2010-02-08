@@ -15,6 +15,20 @@ end
 
 describe Delayed::Job do
   
+  describe 'deserialize' do
+    
+    it 'should deserialize a YAML object' do
+      dj = Delayed::Job.new
+      source = <<-EOF
+      --- !ruby/object:PostmanWorker \nargs: \n- !ruby/object:Email \n  attributes: \n    id: \"1\"\n    user_id: \"1\"\n    address: mark@shortbord.com\n    email_hash: 21f4652e24f47af880f26df92f3122f7\n    token: 356a8a6af69ed9e6bcdf335736bfa68e50754fad\n    state: unconfirmed\n    created_at: 2010-02-05 21:18:12.39589\n    updated_at: 2010-02-05 21:18:12.39589\n  attributes_cache: {}\n\ncalled_method: email_verification\npriority: 10000\nrun_at: 2010-02-08 11:09:17.667792 -05:00\nworker_class_name: postman_worker\n
+EOF
+      source.strip!
+      source.scan(/!ruby\/object:(\S+)\s/).flatten.should == ['PostmanWorker', 'Email']
+      # dj.deserialize_with_extras(source)
+    end
+    
+  end
+  
   describe 'reset!' do
     
     it 'should reset the job so to prestine conditions' do

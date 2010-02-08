@@ -11,13 +11,12 @@ module Delayed
     
     def deserialize_with_extras(source)
       begin
-        self['handler'].scan(/- .+ !ruby\/object:(.+)/).flatten.each do |x| 
+        source.scan(/!ruby\/object:(\S+)\s/).flatten.each do |x| 
           x.strip!
-          # puts "x: '#{x}'"
           x.to_s.constantize
         end
       rescue Exception => e
-        logger.error "Failed pre-deserialization: #{e.message}"
+        raise e
       end
       deserialize_without_extras(source)
     end
