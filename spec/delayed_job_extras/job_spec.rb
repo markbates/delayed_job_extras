@@ -1,9 +1,8 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
 class OneOfAKind < DJ::Worker
-  def unique?
-    true
-  end
+  is_unique
+  
   def perform
   end
 end

@@ -19,6 +19,7 @@ module Delayed
         attr_accessor :__original_args
         attr_accessor :__re_enqueue_block
         attr_accessor :re_enqueuable
+        attr_accessor :id
 
         def priority
           case @priority
@@ -40,7 +41,11 @@ module Delayed
         end
         
         def worker_class_name
-          @worker_class_name ||= self.class.to_s.underscore
+          if self.id
+            @worker_class_name ||= File.join(self.class.to_s.underscore, self.id.to_s)
+          else
+            @worker_class_name ||= self.class.to_s.underscore
+          end
         end
         
         def enqueue(priority = self.priority, run_at = self.run_at)
@@ -79,6 +84,12 @@ module Delayed
               level = Delayed::Job::Extras::PRIORITY_LEVELS[level] ||= 0
             end
             return @priority ||= level
+          end
+        end
+        
+        def is_unique
+          define_method('unique?') do
+            return true
           end
         end
         

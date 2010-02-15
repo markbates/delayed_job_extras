@@ -7,7 +7,9 @@ if defined?(ActionMailer)
         def inherited(klass)
           super
           eval %{
-            class ::#{klass}Worker < DJ::Worker
+            class ::#{klass}Worker
+              include Delayed::Job::Extras
+              
               priority :immediate
 
               attr_accessor :called_method
