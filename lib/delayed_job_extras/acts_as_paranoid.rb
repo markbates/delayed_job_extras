@@ -9,7 +9,7 @@ begin
     begin
       module Delayed
         class Job
-          include HoptoadNotifier::Catcher
+          # include HoptoadNotifier::Catcher
         
           acts_as_paranoid
         
