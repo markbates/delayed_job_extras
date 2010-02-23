@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require 'spec_helper'
 
 class OneOfAKind < DJ::Worker
   is_unique

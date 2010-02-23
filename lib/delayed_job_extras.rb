@@ -12,4 +12,4 @@ require File.join(path, 'worker')
 require File.join(path, 'action_mailer')
 
 require File.join(path, 'hoptoad')
-require File.join(path, 'acts_as_paranoid')
+# require File.join(path, 'acts_as_paranoid')
