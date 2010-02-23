@@ -11,7 +11,6 @@ module Delayed
       
       module InstanceMethods
         
-        attr_accessor :dj_object
         attr_accessor :run_at
         attr_accessor :priority
         attr_accessor :logger
@@ -62,6 +61,14 @@ module Delayed
           cl = super
           cl.run_at = nil
           cl
+        end
+        
+        def dj_object=(dj)
+          @dj_object = dj.id
+        end
+        
+        def dj_object
+          Delayed::Job.find(@dj_object)
         end
         
       end # InstanceMethods
