@@ -56,7 +56,7 @@ Spec::Runner.configure do |config|
 end
 
 module HoptoadNotifier
-  def self.notify(*args)
+  def self.notify_or_ignore(*args)
   end
 end
 

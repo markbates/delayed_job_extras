@@ -12,7 +12,7 @@ begin
               begin
                 invoke_job_without_hoptoad
               rescue Exception => e
-                HoptoadNotifier.notify(e, :cgi_data => self.attributes)
+                HoptoadNotifier.notify_or_ignore(e, :cgi_data => self.attributes)
                 raise e
               end
             end
