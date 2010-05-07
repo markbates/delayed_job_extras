@@ -13,3 +13,9 @@ require File.join(path, 'action_mailer')
 
 require File.join(path, 'hoptoad')
 # require File.join(path, 'acts_as_paranoid')
+
+if Rails.version.match(/^2/)
+  require File.join(path, 'validate_with_unique')
+else
+  require File.join(path, 'unique_dj_validator')
+end
