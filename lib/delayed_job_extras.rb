@@ -9,13 +9,15 @@ require File.join(path, 'extras')
 require File.join(path, 'job')
 require File.join(path, 'performable_method')
 require File.join(path, 'worker')
-require File.join(path, 'action_mailer')
+
 
 require File.join(path, 'hoptoad')
 # require File.join(path, 'acts_as_paranoid')
 
 if Rails.version.match(/^2/)
+  require File.join(path, 'action_mailer')
   require File.join(path, 'validate_with_unique')
 else
+  # require File.join(path, 'action_mailer_rails3')
   require File.join(path, 'unique_dj_validator')
 end
